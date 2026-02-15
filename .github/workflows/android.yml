@@ -34,4 +34,3 @@ jobs:
           buildozer android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
-          
