@@ -7,6 +7,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -21,9 +28,8 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          # Мы НЕ указываем пути к системному SDK. 
-          # Мы даем Buildozer скачать свой собственный SDK в папку проекта.
           yes | buildozer android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx2048m"
           
