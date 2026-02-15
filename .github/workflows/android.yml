@@ -12,32 +12,26 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git python3-dev libffi-dev libssl-dev cmake openjdk-17-jdk zip unzip zlib1g-dev autoconf libtool pkg-config
           pip install --upgrade pip
           pip install "cython<3.0.0" buildozer
 
-      - name: Setup Android SDK Path
+      - name: Pre-configure Buildozer SDK
         run: |
-          # Принимаем лицензии
-          yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses || true
-          # Находим путь к aidl и добавляем в PATH
-          AIDL_PATH=$(find $ANDROID_HOME/build-tools -name "aidl" | head -n 1)
-          echo "$(dirname $AIDL_PATH)" >> $GITHUB_PATH
+          # Создаем структуру папок, которую ожидает Buildozer
+          mkdir -p /home/runner/.buildozer/android/platform/android-sdk/build-tools/33.0.0
+          # Копируем системный aidl в папку Buildozer
+          cp $ANDROID_HOME/build-tools/33.0.0/aidl /home/runner/.buildozer/android/platform/android-sdk/build-tools/33.0.0/
+          # Принимаем лицензии для этого пути
+          yes | sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk --licenses || true
 
       - name: Build with Buildozer
         run: |
-          export ANDROID_SDK_ROOT=$ANDROID_HOME
+          # Запускаем сборку. Теперь Buildozer увидит aidl там, где искал.
           buildozer android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: WarehouseScanner-APK
-          path: bin/*.apk
           
