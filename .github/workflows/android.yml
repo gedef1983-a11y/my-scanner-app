@@ -19,13 +19,25 @@ jobs:
           pip install --upgrade pip
           pip install "cython<3.0.0" buildozer
 
+      - name: Setup Android SDK Path
+        run: |
+          # Принимаем лицензии
+          yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses || true
+          # Находим путь к aidl и добавляем в PATH
+          AIDL_PATH=$(find $ANDROID_HOME/build-tools -name "aidl" | head -n 1)
+          echo "$(dirname $AIDL_PATH)" >> $GITHUB_PATH
+
       - name: Build with Buildozer
         run: |
-          # Принудительно указываем пути к существующему SDK в GitHub Actions
           export ANDROID_SDK_ROOT=$ANDROID_HOME
-          export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
           buildozer android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
           GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WarehouseScanner-APK
+          path: bin/*.apk
           
