@@ -15,11 +15,11 @@ android.permissions = CAMERA, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, INT
 
 # Версии SDK и NDK (проверенная связка)
 android.api = 33
-android.minapi = 21
+android.minapi = 26
 #android.sdk = 33
 android.ndk = 25b
-android.ndk_path = 
-android.ndk_api = 21
+#android.ndk_path = 
+android.ndk_api = 26
 android.arch_arm64_v8a = True
 android.allow_backup = True
 
