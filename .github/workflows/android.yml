@@ -26,15 +26,22 @@ jobs:
           pip install --upgrade pip
           pip install "cython<3.0.0" buildozer
 
-      -  name: Build with Buildozer
+      - name: Build with Buildozer
         run: |
-          # Принудительное создание файлов лицензий, чтобы sdkmanager не спрашивал
+          # Создаем папки лицензий заранее
           mkdir -p /home/runner/.buildozer/android/platform/android-sdk/licenses
           echo -e "8933bad161af4178b1185d1a37fbf41ea5269c55\nd5624a996839a99227e5965bea033f5a77528159\n24333f8a63b6825ea9c5573f8435929d00fca03a" > /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
           echo -e "84831b9409646a918e30573bab4c9c91346d8abd\n50466322461015d0865f3c2f458e1ecf422029b1" > /home/runner/.buildozer/android/platform/android-sdk/licenses/android-googletv-license
           
-          # Запуск сборки с авто-подтверждением
-          buildozer android debug || (yes | buildozer android debug)
+          # Основная сборка
+          yes | buildozer android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx2048m"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WarehouseScanner-APK
+          path: bin/*.apk
+          
