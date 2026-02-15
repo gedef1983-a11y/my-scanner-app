@@ -15,32 +15,18 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            git \
-            python3-dev \
-            libffi-dev \
-            libssl-dev \
-            cmake \
-            openjdk-17-jdk \
-            zip \
-            unzip \
-            zlib1g-dev \
-            autoconf \
-            libtool \
-            pkg-config
+          sudo apt-get install -y build-essential git python3-dev libffi-dev libssl-dev cmake openjdk-17-jdk zip unzip zlib1g-dev autoconf libtool pkg-config
           pip install --upgrade pip
           pip install "cython<3.0.0" buildozer
+
+      - name: Install Android AIDL
+        run: |
+          # Установка конкретного компонента SDK, который требует Buildozer
+          sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "build-tools;33.0.0"
 
       - name: Build with Buildozer
         run: |
           buildozer android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: WarehouseScanner-APK
-          path: bin/*.apk
+          
