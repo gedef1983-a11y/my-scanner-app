@@ -19,19 +19,15 @@ jobs:
             build-essential \
             git \
             python3-dev \
-            generate-secrets \
             libffi-dev \
             libssl-dev \
             cmake \
-            ant \
-            python3-setuptools \
             openjdk-17-jdk \
             zip \
             unzip \
-            zlib1g-dev \
-            libltdl-dev
+            zlib1g-dev
           pip install --upgrade pip
-          pip install buildozer cython==0.29.33 kivy[base]
+          pip install buildozer cython==0.29.33
 
       - name: Build with Buildozer
         run: |
