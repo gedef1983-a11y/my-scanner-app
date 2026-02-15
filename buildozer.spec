@@ -15,6 +15,7 @@ android.permissions = CAMERA, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, INT
 
 # Версии SDK и NDK (проверенная связка)
 android.api = 33
+android.build_tools_version = 33.0.0
 android.minapi = 26
 #android.sdk = 33
 android.ndk = 25b
