@@ -28,13 +28,26 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          # Создаем папки лицензий заранее
-          mkdir -p /home/runner/.buildozer/android/platform/android-sdk/licenses
-          echo -e "8933bad161af4178b1185d1a37fbf41ea5269c55\nd5624a996839a99227e5965bea033f5a77528159\n24333f8a63b6825ea9c5573f8435929d00fca03a" > /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          echo -e "84831b9409646a918e30573bab4c9c91346d8abd\n50466322461015d0865f3c2f458e1ecf422029b1" > /home/runner/.buildozer/android/platform/android-sdk/licenses/android-googletv-license
+          # 1. Первый проход: заставляем Buildozer создать структуру папок SDK
+          # Он может упасть на лицензиях, это нормально (используем || true)
+          buildozer android debug || true
           
-          # Основная сборка
-          yes | buildozer android debug
+          # 2. Динамический поиск sdkmanager (исправляет ошибку "does not exist")
+          SDK_DIR="/home/runner/.buildozer/android/platform/android-sdk"
+          SDK_MANAGER=$(find /home/runner/.buildozer -name "sdkmanager" | head -n 1)
+          
+          # 3. Если менеджер найден, принимаем лицензии напрямую
+          if [ -n "$SDK_MANAGER" ]; then
+            echo "Found sdkmanager at $SDK_MANAGER. Accepting licenses..."
+            yes | $SDK_MANAGER --sdk_root=$SDK_DIR --licenses || true
+          fi
+
+          # 4. Создаем файлы-маркеры лицензий для надежности
+          mkdir -p $SDK_DIR/licenses
+          echo -e "8933bad161af4178b1185d1a37fbf41ea5269c55\nd5624a996839a99227e5965bea033f5a77528159\n24333f8a63b6825ea9c5573f8435929d00fca03a" > $SDK_DIR/licenses/android-sdk-license
+          
+          # 5. Финальный запуск сборки
+          buildozer android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
           GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx2048m"
